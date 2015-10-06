@@ -5,15 +5,7 @@
 
 ## Install
 
-### [npm](https://github.com/sindresorhus/node-win-wallpaper#cli)
-
-```
-$ npm install --global win-wallpaper
-```
-
-### Manually
-
-[Download the binary](https://github.com/sindresorhus/win-wallpaper/releases/latest) and put it somewhere in your `%path%`.
+[Download](https://github.com/sindresorhus/win-wallpaper/releases/latest) the binary and put it somewhere in your [`%path%`](http://stackoverflow.com/a/28778358/64949).
 
 
 ## Usage
@@ -28,19 +20,18 @@ wallpaper
 ```
 
 
-## Dev
+## Build
 
-To compile you'll need a C compiler like `gcc`, which you can get by installing [`MinGW`](http://www.mingw.org/).
+Install [`MinGW-w64`](http://sourceforge.net/projects/mingw-w64) and run:
 
 ```
-$ gcc wallpaper.c -o wallpaper.exe
+$ build
 ```
 
 
 ## Related
 
-- [`node-win-wallpaper`](https://github.com/sindresorhus/node-win-wallpaper) - Node wrapper.
-- [`wallpaper`](https://github.com/sindresorhus/wallpaper) - Get or set the desktop wallpaper.
+- [wallpaper](https://github.com/sindresorhus/wallpaper) - Get or set the desktop wallpaper.
 
 
 ## License
