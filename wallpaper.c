@@ -4,7 +4,7 @@
 int wmain(int argc, wchar_t **argv) {
 	if (argc > 1) {
 		if (wcscmp(argv[1], L"--version") == 0) {
-			puts("1.0.0");
+			puts("1.1.0");
 			return 0;
 		}
 
