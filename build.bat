@@ -2,4 +2,4 @@
 
 set filename=wallpaper
 
-gcc "%filename%".c -O2 -s -o "%filename%".exe
+gcc "%filename%".c -municode -O2 -s -o "%filename%".exe
