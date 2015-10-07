@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <windows.h>
+#include <fcntl.h>
 
 int wmain(int argc, wchar_t **argv) {
 	if (argc > 1) {
@@ -28,8 +29,8 @@ int wmain(int argc, wchar_t **argv) {
 		wchar_t imagePath[MAX_PATH];
 
 		if (SystemParametersInfoW(SPI_GETDESKWALLPAPER, MAX_PATH, imagePath, 0)) {
-			DWORD written;
-			WriteConsoleW(GetStdHandle(STD_OUTPUT_HANDLE), &imagePath[0], wcslen(&imagePath[0]), &written, 0);
+			_setmode(_fileno(stdout), _O_U8TEXT);
+			wprintf(L"%s\n", imagePath);
 		} else {
 			fputs("Failed to get the desktop wallpaper", stderr);
 			return 1;
