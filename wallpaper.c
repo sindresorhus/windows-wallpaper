@@ -10,7 +10,7 @@ int wmain(int argc, wchar_t **argv) {
 		}
 
 		if (wcscmp(argv[1], L"--help") == 0) {
-			puts("\n  Get or set the desktop wallpaper\n\n  Usage: wallpaper [file]\n\n  Created by Sindre Sorhus");
+			puts("\n  Manage the desktop wallpaper\n\n  Usage: wallpaper [file]\n\n  Created by Sindre Sorhus");
 			return 0;
 		}
 

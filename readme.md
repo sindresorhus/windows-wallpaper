@@ -1,6 +1,6 @@
 # win-wallpaper
 
-> Get or set the desktop wallpaper on Windows
+> Manage the desktop wallpaper on Windows
 
 
 ## Install
@@ -11,10 +11,10 @@
 ## Usage
 
 ```sh
-# set
+# Set
 wallpaper unicorn.jpg
 
-# get
+# Get
 wallpaper
 > /Users/sindresorhus/unicorn.jpg
 ```
@@ -36,4 +36,4 @@ $ build
 
 ## License
 
-MIT © [Sindre Sorhus](http://sindresorhus.com)
+MIT © [Sindre Sorhus](https://sindresorhus.com)
