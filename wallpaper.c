@@ -21,7 +21,7 @@ int wmain(int argc, wchar_t **argv) {
 			return 1;
 		}
 
-		if (!SystemParametersInfoW(SPI_SETDESKWALLPAPER, 0, fullPath, SPIF_SENDCHANGE)) {
+		if (!SystemParametersInfoW(SPI_SETDESKWALLPAPER, 0, fullPath, SPIF_UPDATEINIFILE | SPIF_SENDCHANGE)) {
 			fputs("Failed to set the desktop wallpaper", stderr);
 			return 1;
 		}
