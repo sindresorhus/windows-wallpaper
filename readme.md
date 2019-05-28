@@ -2,6 +2,8 @@
 
 > Manage the desktop wallpaper on Windows
 
+*Requires Windows 10 or later.*
+
 
 ## Install
 
