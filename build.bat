@@ -2,4 +2,4 @@
 
 set filename=wallpaper
 
-gcc "%filename%".c -municode -O2 -s -o "%filename%".exe
+g++ "%filename%".cpp -luuid -lole32 -municode -O2 -s -o "%filename%".exe

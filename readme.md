@@ -16,18 +16,29 @@
 # Set
 wallpaper unicorn.jpg
 
+# Set with scaling options
+wallpaper unicorn.jpg --scale [center | stretch | tile |  span | max | crop-to-fit | keep-aspect-ratio]
+
 # Get
 wallpaper
 > /Users/sindresorhus/unicorn.jpg
 ```
 
+# For contributors
+
+## Dependencies
+Install [`MinGW-w64`](http://sourceforge.net/projects/mingw-w64) from their official repository.
+
+-OR-
+```
+$ choco install mingw
+```
 
 ## Build
 
-Install [`MinGW-w64`](http://sourceforge.net/projects/mingw-w64) and run:
-
+Inside the project's folder:
 ```
-$ build
+$ .\build
 ```
 
 
