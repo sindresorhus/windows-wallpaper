@@ -24,8 +24,6 @@ wallpaper
 > /Users/sindresorhus/unicorn.jpg
 ```
 
-# For contributors
-
 ## Dependencies
 Install [`MinGW-w64`](http://sourceforge.net/projects/mingw-w64) from their official repository.
 
