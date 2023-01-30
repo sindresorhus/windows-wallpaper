@@ -50,7 +50,6 @@ int SetWallpaper(LPWSTR fullPath, int wpStyle = WPSTYLE_SPAN) {
 }
 
 int wmain(int argc, wchar_t **argv) {
-
 	if (argc <= 1) {
 		wchar_t imagePath[MAX_PATH];
 		GetWallpaper(imagePath);
