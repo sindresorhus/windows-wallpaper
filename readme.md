@@ -26,7 +26,7 @@ wallpaper
 
 Install [`MinGW-w64`](http://sourceforge.net/projects/mingw-w64) from their official repository.
 
--OR-
+**or**
 
 ```sh
 choco install mingw
@@ -36,14 +36,10 @@ choco install mingw
 
 Inside the project's folder:
 
-```sh
+```
 .\build
 ```
 
 ## Related
 
 - [wallpaper](https://github.com/sindresorhus/wallpaper) - Get or set the desktop wallpaper.
-
-## License
-
-MIT © [Sindre Sorhus](https://sindresorhus.com)
