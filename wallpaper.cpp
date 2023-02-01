@@ -61,8 +61,10 @@ int wmain(int argc, wchar_t **argv) {
 	if (argc <= 1) {
 		wchar_t imagePath[MAX_PATH];
 		if (GetWallpaper(imagePath) == 0) {
+			imagePath[MAX_PATH - 1] = L'\0';
 			wprintf(L"%ls\n", imagePath);
 		}
+		return 0;
 	}
 
 	if (wcscmp(argv[1], L"--version") == 0) {
