@@ -4,23 +4,31 @@
 #include <fcntl.h>
 #include <io.h>
 
-void GetWallpaper(wchar_t *szWallpaper) {
+int GetWallpaper(wchar_t *szWallpaper) {
 	CoInitialize(NULL);   
 	IActiveDesktop *pDesk;
-	HRESULT hr = CoCreateInstance(CLSID_ActiveDesktop, NULL, CLSCTX_INPROC_SERVER, IID_IActiveDesktop, (void**)&pDesk);
 
+	HRESULT hr = CoCreateInstance(CLSID_ActiveDesktop, NULL, CLSCTX_INPROC_SERVER, IID_IActiveDesktop, (void**)&pDesk);
+	if (FAILED(hr)) {
+		_com_error err(hr);
+		fputs("Could not initialize the COM Library", stderr);
+		pDesk->Release();
+		CoUninitialize();
+		return 1;
+	}
+
+	hr = pDesk->GetWallpaper(&szWallpaper[0], MAX_PATH, 0);
 	if (FAILED(hr)) {
 		_com_error err(hr);
 		fputs("Failed to get the desktop wallpaper", stderr);
 		pDesk->Release();
-		CoFreeUnusedLibraries();
 		CoUninitialize();
+		return 1;
 	}
 
-	pDesk->GetWallpaper(&szWallpaper[0], MAX_PATH, 0);
 	pDesk->Release();
-	CoFreeUnusedLibraries();
 	CoUninitialize();
+	return 0;
 }
 
 int SetWallpaper(LPWSTR fullPath, int wpStyle = WPSTYLE_SPAN) {
@@ -52,8 +60,9 @@ int SetWallpaper(LPWSTR fullPath, int wpStyle = WPSTYLE_SPAN) {
 int wmain(int argc, wchar_t **argv) {
 	if (argc <= 1) {
 		wchar_t imagePath[MAX_PATH];
-		GetWallpaper(imagePath);
-		wprintf(L"%ls\n", imagePath);
+		if (GetWallpaper(imagePath) == 0) {
+			wprintf(L"%ls\n", imagePath);
+		}
 	}
 
 	if (wcscmp(argv[1], L"--version") == 0) {
