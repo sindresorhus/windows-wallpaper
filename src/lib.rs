@@ -2,7 +2,7 @@ use std::path::{Path, PathBuf};
 
 use clap::ValueEnum;
 use windows::{
-    core::{Result, PCWSTR, PWSTR},
+    core::{Result, HSTRING, PCWSTR, PWSTR},
     Win32::{
         System::Com::{
             CoCreateInstance, CoFreeUnusedLibraries, CoInitialize, CoUninitialize,
@@ -52,12 +52,10 @@ pub struct DesktopWallpaper {
 
 impl DesktopWallpaper {
     pub fn new() -> Result<Self> {
-        let interface: IDesktopWallpaper;
-
-        unsafe {
+        let interface: IDesktopWallpaper = unsafe {
             CoInitialize(None)?;
-            interface = CoCreateInstance(&DesktopWallpaper, None, CLSCTX_LOCAL_SERVER)?;
-        }
+            CoCreateInstance(&DesktopWallpaper, None, CLSCTX_LOCAL_SERVER)?
+        };
 
         Ok(Self { interface })
     }
@@ -67,41 +65,32 @@ impl DesktopWallpaper {
 
         (0..monitor_count)
             .map(|index| -> Result<Monitor> {
-                unsafe {
-                    let monitor_index = self.interface.GetMonitorDevicePathAt(index)?;
-                    let wallpaper = self.interface.GetWallpaper(PCWSTR(monitor_index.0))?;
+                let monitor_index = unsafe { self.interface.GetMonitorDevicePathAt(index)? };
+                let wallpaper = unsafe { self.interface.GetWallpaper(PCWSTR(monitor_index.0))? };
 
-                    Ok(Monitor {
-                        monitor_index,
-                        wallpaper,
-                    })
-                }
+                Ok(Monitor {
+                    monitor_index,
+                    wallpaper,
+                })
             })
             .collect()
     }
 
     pub fn get_wallpaper(&self, monitor: &Monitor) -> Option<PathBuf> {
-        unsafe {
-            let wallpaper: Result<PWSTR> =
-                self.interface.GetWallpaper(PCWSTR(monitor.monitor_index.0));
+        let wallpaper: Result<PWSTR> =
+            unsafe { self.interface.GetWallpaper(PCWSTR(monitor.monitor_index.0)) };
 
-            let wallpaper_string = match wallpaper {
-                Ok(pwstr) => pwstr.to_string().ok()?,
-                Err(_) => String::new(),
-            };
-
-            let path = Path::new(&wallpaper_string);
-
-            if path.exists() && path.is_file() {
-                if let Some(path) = path.parent() {
-                    if path.is_dir() {
-                        return Some(path.to_path_buf());
-                    }
-                }
+        let wallpaper_string = match wallpaper {
+            Ok(pwstr) => unsafe { pwstr.to_string().ok()? },
+            Err(error) => {
+                eprintln!("{error}");
+                return None;
             }
+        };
 
-            None
-        }
+        let path = Path::new(&wallpaper_string);
+
+        (path.exists() && path.is_file()).then_some(path.to_path_buf())
     }
 
     pub fn set_wallpaper(
@@ -111,18 +100,9 @@ impl DesktopWallpaper {
         position: DesktopWallpaperPosition,
     ) -> Result<()> {
         unsafe {
-            let full_path = format!(
-                "{}",
-                path.canonicalize()
-                    .expect("Could not canonicalize")
-                    .display()
-            );
-
-            let mut encoded = full_path.encode_utf16().chain([0u16]).collect::<Vec<u16>>();
-
             self.interface.SetWallpaper(
                 PCWSTR(monitor.monitor_index.0),
-                PCWSTR(encoded.as_mut_ptr()),
+                &HSTRING::from(path.as_os_str()),
             )?;
 
             self.interface.SetPosition(position.into())
