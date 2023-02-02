@@ -1,18 +1,12 @@
 use std::path::{Path, PathBuf};
 
-use clap::{command, Parser, Subcommand};
+use clap::{command, Parser};
 use wallpaper::{DesktopWallpaper, DesktopWallpaperPosition, Monitor};
 
 /// Manage the desktop wallpaper on Windows
 #[derive(Debug, Parser)]
 #[command(author, version, about, long_about = None)]
-struct Cli {
-    #[command(subcommand)]
-    command: Commands,
-}
-
-#[derive(Debug, Subcommand)]
-enum Commands {
+enum Args {
     /// Gets current wallpaper
     Get {
         /// Index of monitor starting from 0
@@ -30,7 +24,6 @@ enum Commands {
             short,
             long,
             default_value_t = DesktopWallpaperPosition::Span,
-            default_missing_value = "always",
             value_enum
         )]
         scale: DesktopWallpaperPosition,
@@ -40,50 +33,42 @@ enum Commands {
     },
 }
 
-fn if_chosen_monitor_within_range(choice: usize, monitors: &[Monitor], func: impl Fn()) {
-    if choice < monitors.len() {
-        func();
-    } else {
-        eprintln!(
-            "The available monitors are from 0 to {} but {choice} was given",
+fn if_chosen_monitor_within_range(
+    choice: usize,
+    monitors: &[Monitor],
+    func: impl FnOnce(&Monitor) -> Result<(), String>,
+) -> Result<(), String> {
+    match monitors.get(choice) {
+        Some(m) => func(m),
+        None => Err(format!(
+            "The available monitors are from 0 - {} but {choice} was given",
             monitors.len() - 1,
-        );
+        )),
     }
 }
 
-fn main() {
-    let wallpaper = match DesktopWallpaper::new() {
-        Ok(wallpaper) => wallpaper,
-        Err(error) => {
-            eprintln!("{error}");
-            return;
-        }
-    };
-    let monitors = match wallpaper.get_monitors() {
-        Ok(monitors) => monitors,
-        Err(error) => {
-            eprintln!("Failed to retrieve available monitors: {error}");
-            return;
-        }
-    };
+fn main() -> Result<(), String> {
+    let wallpaper = DesktopWallpaper::new().map_err(|e| e.to_string())?;
+    let monitors = wallpaper
+        .get_monitors()
+        .map_err(|error| format!("Failed to retrieve available monitors: {error}"))?;
 
-    let args = Cli::parse();
-    match args.command {
-        Commands::Get { monitor } => if_chosen_monitor_within_range(monitor, &monitors, || {
-            match wallpaper.get_wallpaper(&monitors[monitor]) {
-                Some(path) => println!("{}", path.display()),
-                None => eprintln!("Failed to get the desktop wallpaper"),
-            }
-        }),
-        Commands::Set {
+    let args = Args::parse();
+
+    match args {
+        Args::Get { monitor } => if_chosen_monitor_within_range(monitor, &monitors, |monitor| {
+            Ok(println!("{}", wallpaper.get_wallpaper(monitor)?.display()))
+        })?,
+        Args::Set {
             monitor,
             scale,
             path,
-        } => if_chosen_monitor_within_range(monitor, &monitors, || {
-            match wallpaper.set_wallpaper(&monitors[monitor], Path::new(&path), scale) {
-                Ok(_) => (),
-                Err(error) => eprintln!("Failed to set the desktop wallpaper: {error}"),
-            }
-        }),
+        } => if_chosen_monitor_within_range(monitor, &monitors, |monitor| {
+            wallpaper
+                .set_wallpaper(monitor, Path::new(&path), scale)
+                .map_err(|error| format!("Failed to set the desktop wallpaper: {error}"))
+        })?,
     }
+
+    Ok(())
 }

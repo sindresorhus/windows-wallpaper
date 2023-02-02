@@ -76,21 +76,20 @@ impl DesktopWallpaper {
             .collect()
     }
 
-    pub fn get_wallpaper(&self, monitor: &Monitor) -> Option<PathBuf> {
-        let wallpaper: Result<PWSTR> =
-            unsafe { self.interface.GetWallpaper(PCWSTR(monitor.monitor_index.0)) };
-
-        let wallpaper_string = match wallpaper {
-            Ok(pwstr) => unsafe { pwstr.to_string().ok()? },
-            Err(error) => {
-                eprintln!("{error}");
-                return None;
-            }
+    pub fn get_wallpaper(&self, monitor: &Monitor) -> std::result::Result<PathBuf, String> {
+        let wallpaper: PWSTR = unsafe {
+            self.interface
+                .GetWallpaper(PCWSTR(monitor.monitor_index.0))
+                .map_err(|e| e.to_string())?
         };
+
+        let wallpaper_string = unsafe { wallpaper.to_string().map_err(|e| e.to_string())? };
 
         let path = Path::new(&wallpaper_string);
 
-        (path.exists() && path.is_file()).then_some(path.to_path_buf())
+        (path.exists() && path.is_file())
+            .then_some(path.to_path_buf())
+            .ok_or("Failed to get the desktop wallpaper".to_string())
     }
 
     pub fn set_wallpaper(
