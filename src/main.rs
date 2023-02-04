@@ -48,7 +48,7 @@ fn if_chosen_monitor_within_range(
 }
 
 fn main() -> Result<(), String> {
-    let wallpaper = DesktopWallpaper::new().map_err(|e| e.to_string())?;
+    let mut wallpaper = DesktopWallpaper::new().map_err(|e| e.to_string())?;
     let monitors = wallpaper
         .get_monitors()
         .map_err(|error| format!("Failed to retrieve available monitors: {error}"))?;

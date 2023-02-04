@@ -1,4 +1,8 @@
-use std::path::{Path, PathBuf};
+use std::{
+    ffi::OsString,
+    os::windows::prelude::{OsStrExt, OsStringExt},
+    path::{Path, PathBuf},
+};
 
 use clap::ValueEnum;
 use windows::{
@@ -41,8 +45,8 @@ impl From<DesktopWallpaperPosition> for DESKTOP_WALLPAPER_POSITION {
 
 #[derive(Debug)]
 pub struct Monitor {
-    pub monitor_index: PWSTR,
-    pub wallpaper: PWSTR,
+    pub monitor_index: OsString,
+    pub wallpaper: OsString,
 }
 
 #[derive(Debug)]
@@ -65,8 +69,18 @@ impl DesktopWallpaper {
 
         (0..monitor_count)
             .map(|index| -> Result<Monitor> {
-                let monitor_index = unsafe { self.interface.GetMonitorDevicePathAt(index)? };
-                let wallpaper = unsafe { self.interface.GetWallpaper(PCWSTR(monitor_index.0))? };
+                let monitor_index = unsafe {
+                    OsString::from_wide(self.interface.GetMonitorDevicePathAt(index)?.as_wide())
+                };
+                let wallpaper = unsafe {
+                    OsString::from_wide(
+                        self.interface
+                            .GetWallpaper(PCWSTR::from_raw(
+                                monitor_index.encode_wide().collect::<Vec<u16>>().as_ptr(),
+                            ))?
+                            .as_wide(),
+                    )
+                };
 
                 Ok(Monitor {
                     monitor_index,
@@ -79,11 +93,17 @@ impl DesktopWallpaper {
     pub fn get_wallpaper(&self, monitor: &Monitor) -> std::result::Result<PathBuf, String> {
         let wallpaper: PWSTR = unsafe {
             self.interface
-                .GetWallpaper(PCWSTR(monitor.monitor_index.0))
+                .GetWallpaper(PCWSTR(
+                    monitor
+                        .monitor_index
+                        .encode_wide()
+                        .collect::<Vec<u16>>()
+                        .as_ptr(),
+                ))
                 .map_err(|e| e.to_string())?
         };
 
-        let wallpaper_string = unsafe { wallpaper.to_string().map_err(|e| e.to_string())? };
+        let wallpaper_string = unsafe { OsString::from_wide(wallpaper.as_wide()) };
 
         let path = Path::new(&wallpaper_string);
 
@@ -93,14 +113,20 @@ impl DesktopWallpaper {
     }
 
     pub fn set_wallpaper(
-        &self,
+        &mut self,
         monitor: &Monitor,
         path: &Path,
         position: DesktopWallpaperPosition,
     ) -> Result<()> {
         unsafe {
             self.interface.SetWallpaper(
-                PCWSTR(monitor.monitor_index.0),
+                PCWSTR(
+                    monitor
+                        .monitor_index
+                        .encode_wide()
+                        .collect::<Vec<u16>>()
+                        .as_ptr(),
+                ),
                 &HSTRING::from(path.as_os_str()),
             )?;
 
