@@ -18,7 +18,7 @@ wallpaper set unicorn.jpg
 wallpaper set unicorn.jpg --scale [center | stretch | tile |  span | fit | fill]
 
 # Get
-wallpaper
+wallpaper get
 > /Users/sindresorhus/unicorn.jpg
 ```
 
