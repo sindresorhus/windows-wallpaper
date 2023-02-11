@@ -7,8 +7,9 @@ use wallpaper::{DesktopWallpaper, DesktopWallpaperPosition, Monitor};
 #[derive(Debug, Parser)]
 #[command(author, version, about, long_about = None)]
 enum Args {
-    /// Gets current wallpaper
+    /// Gets the current wallpaper
     Get {
+        // TODO: Use `value_parser`. See: https://docs.rs/clap/latest/clap/_derive/_tutorial/index.html#validated-values
         /// Index of monitor starting from 0
         #[arg(short, long, default_value_t = 0)]
         monitor: usize,
