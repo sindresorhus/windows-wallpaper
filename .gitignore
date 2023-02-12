@@ -1,1 +1,5 @@
 wallpaper.exe
+
+# Added by cargo
+/target
+/Cargo.lock
