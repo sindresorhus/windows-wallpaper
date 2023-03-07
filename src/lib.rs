@@ -8,10 +8,7 @@ use clap::ValueEnum;
 use windows::{
     core::{Result, HSTRING, PCWSTR, PWSTR},
     Win32::{
-        System::Com::{
-            CoCreateInstance, CoFreeUnusedLibraries, CoInitialize, CoUninitialize,
-            CLSCTX_LOCAL_SERVER,
-        },
+        System::Com::{CoCreateInstance, CoFreeUnusedLibraries, CoInitialize, CLSCTX_LOCAL_SERVER},
         UI::Shell::{
             DesktopWallpaper, IDesktopWallpaper, DESKTOP_WALLPAPER_POSITION, DWPOS_CENTER,
             DWPOS_FILL, DWPOS_FIT, DWPOS_SPAN, DWPOS_STRETCH, DWPOS_TILE,
@@ -139,7 +136,7 @@ impl Drop for DesktopWallpaper {
     fn drop(&mut self) {
         unsafe {
             CoFreeUnusedLibraries();
-            CoUninitialize();
+            // CoUninitialize();
         }
     }
 }

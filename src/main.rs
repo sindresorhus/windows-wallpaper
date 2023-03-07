@@ -2,6 +2,7 @@ use std::path::{Path, PathBuf};
 
 use clap::{command, Parser};
 use wallpaper::{DesktopWallpaper, DesktopWallpaperPosition, Monitor};
+use windows::Win32::System::Com::CoUninitialize;
 
 /// Manage the desktop wallpaper on Windows
 #[derive(Debug, Parser)]
@@ -69,6 +70,12 @@ fn main() -> Result<(), String> {
                 .set_wallpaper(monitor, Path::new(&path), scale)
                 .map_err(|error| format!("Failed to set the desktop wallpaper: {error}"))
         })?,
+    }
+
+    drop(wallpaper); // ensure to release of COM pointers before the CoUninitialize call
+
+    unsafe {
+        CoUninitialize();
     }
 
     Ok(())
