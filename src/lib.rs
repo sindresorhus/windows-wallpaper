@@ -145,7 +145,7 @@ impl Drop for DesktopWallpaper {
         }
         unsafe {
             CoFreeUnusedLibraries();
-            CoUninitialize()
+            CoUninitialize();
         }
     }
 }
