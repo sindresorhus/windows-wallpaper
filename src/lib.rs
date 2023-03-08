@@ -1,5 +1,6 @@
 use std::{
     ffi::OsString,
+    mem::ManuallyDrop,
     os::windows::prelude::{OsStrExt, OsStringExt},
     path::{Path, PathBuf},
 };
@@ -8,7 +9,10 @@ use clap::ValueEnum;
 use windows::{
     core::{Result, HSTRING, PCWSTR, PWSTR},
     Win32::{
-        System::Com::{CoCreateInstance, CoFreeUnusedLibraries, CoInitialize, CLSCTX_LOCAL_SERVER},
+        System::Com::{
+            CoCreateInstance, CoFreeUnusedLibraries, CoInitialize, CoUninitialize,
+            CLSCTX_LOCAL_SERVER,
+        },
         UI::Shell::{
             DesktopWallpaper, IDesktopWallpaper, DESKTOP_WALLPAPER_POSITION, DWPOS_CENTER,
             DWPOS_FILL, DWPOS_FIT, DWPOS_SPAN, DWPOS_STRETCH, DWPOS_TILE,
@@ -48,7 +52,7 @@ pub struct Monitor {
 
 #[derive(Debug)]
 pub struct DesktopWallpaper {
-    interface: IDesktopWallpaper,
+    interface: ManuallyDrop<IDesktopWallpaper>,
 }
 
 impl DesktopWallpaper {
@@ -58,7 +62,9 @@ impl DesktopWallpaper {
             CoCreateInstance(&DesktopWallpaper, None, CLSCTX_LOCAL_SERVER)?
         };
 
-        Ok(Self { interface })
+        Ok(Self {
+            interface: ManuallyDrop::new(interface),
+        })
     }
 
     pub fn get_monitors(&self) -> Result<Vec<Monitor>> {
@@ -135,8 +141,11 @@ impl DesktopWallpaper {
 impl Drop for DesktopWallpaper {
     fn drop(&mut self) {
         unsafe {
+            ManuallyDrop::drop(&mut self.interface); // ensure to release of COM pointers before the CoUninitialize call
+        }
+        unsafe {
             CoFreeUnusedLibraries();
-            // CoUninitialize();
+            CoUninitialize()
         }
     }
 }
