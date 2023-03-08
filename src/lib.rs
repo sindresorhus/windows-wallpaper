@@ -141,9 +141,7 @@ impl DesktopWallpaper {
 impl Drop for DesktopWallpaper {
     fn drop(&mut self) {
         unsafe {
-            ManuallyDrop::drop(&mut self.interface); // ensure to release of COM pointers before the CoUninitialize call
-        }
-        unsafe {
+            ManuallyDrop::drop(&mut self.interface);
             CoFreeUnusedLibraries();
             CoUninitialize();
         }
