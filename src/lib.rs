@@ -1,5 +1,6 @@
 use std::{
     ffi::OsString,
+    mem::ManuallyDrop,
     os::windows::prelude::{OsStrExt, OsStringExt},
     path::{Path, PathBuf},
 };
@@ -51,7 +52,7 @@ pub struct Monitor {
 
 #[derive(Debug)]
 pub struct DesktopWallpaper {
-    interface: IDesktopWallpaper,
+    interface: ManuallyDrop<IDesktopWallpaper>,
 }
 
 impl DesktopWallpaper {
@@ -61,7 +62,9 @@ impl DesktopWallpaper {
             CoCreateInstance(&DesktopWallpaper, None, CLSCTX_LOCAL_SERVER)?
         };
 
-        Ok(Self { interface })
+        Ok(Self {
+            interface: ManuallyDrop::new(interface),
+        })
     }
 
     pub fn get_monitors(&self) -> Result<Vec<Monitor>> {
@@ -138,6 +141,7 @@ impl DesktopWallpaper {
 impl Drop for DesktopWallpaper {
     fn drop(&mut self) {
         unsafe {
+            ManuallyDrop::drop(&mut self.interface);
             CoFreeUnusedLibraries();
             CoUninitialize();
         }
