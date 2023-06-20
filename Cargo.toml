@@ -8,7 +8,6 @@ description = "Manage the desktop wallpaper on Windows"
 [[bin]]
 name = "wallpaper"
 
-
 [dependencies]
 clap = { version = "4.3.0", features = ["derive"] }
 windows = { version = "0.48.0", features = [
