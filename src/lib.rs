@@ -21,14 +21,14 @@ use windows::{
 };
 
 #[derive(Debug, Clone, Copy, ValueEnum)]
-#[repr(usize)]
+#[repr(C)]
 pub enum DesktopWallpaperPosition {
-    Center,
-    Tile,
-    Stretch,
-    Fit,
-    Fill,
-    Span,
+    Center = 0,
+    Tile = 1,
+    Stretch = 2,
+    Fit = 3,
+    Fill = 4,
+    Span = 5,
 }
 
 impl From<DesktopWallpaperPosition> for DESKTOP_WALLPAPER_POSITION {
@@ -123,13 +123,7 @@ impl DesktopWallpaper {
     ) -> Result<()> {
         unsafe {
             self.interface.SetWallpaper(
-                PCWSTR(
-                    monitor
-                        .monitor_index
-                        .encode_wide()
-                        .collect::<Vec<u16>>()
-                        .as_ptr(),
-                ),
+                &HSTRING::from(&monitor.monitor_index),
                 &HSTRING::from(path.as_os_str()),
             )?;
 
