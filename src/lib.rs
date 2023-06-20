@@ -121,15 +121,15 @@ impl DesktopWallpaper {
         path: &Path,
         position: DesktopWallpaperPosition,
     ) -> Result<()> {
-        let path = path.canonicalize().expect("Could not get the canonical form of the path.");
+        let path = path
+            .canonicalize()
+            .expect("Could not get the canonical form of the path.");
 
         unsafe {
             self.interface.SetWallpaper(
                 &HSTRING::from(&monitor.monitor_index),
                 &HSTRING::from(path.as_os_str()),
             )?;
-
-            
 
             self.interface.SetPosition(position.into())?;
             Ok(())
