@@ -9,8 +9,8 @@ description = "Manage the desktop wallpaper on Windows"
 name = "wallpaper"
 
 [dependencies]
-clap = { version = "4.1.4", features = ["derive"] }
-windows = { version = "0.44.0", features = [
+clap = { version = "4.3.0", features = ["derive"] }
+windows = { version = "0.48.0", features = [
     "Win32_Foundation",
     "Win32_System_Com",
     "Win32_System_Memory",
