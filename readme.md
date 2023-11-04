@@ -1,4 +1,4 @@
-# win-wallpaper
+# windows-wallpaper
 
 > Manage the desktop wallpaper on Windows
 
@@ -6,7 +6,7 @@
 
 ## Install
 
-[Download](https://github.com/sindresorhus/win-wallpaper/releases/latest) the binary and put it somewhere in your [`%path%`](http://stackoverflow.com/a/28778358/64949).
+[Download](https://github.com/sindresorhus/windows-wallpaper/releases/latest) the binary and put it somewhere in your [`%path%`](http://stackoverflow.com/a/28778358/64949).
 
 ## Usage
 
